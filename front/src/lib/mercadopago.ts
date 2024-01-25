@@ -1,4 +1,15 @@
-const loadCardForm = async (mp: any) => {
+import { loadMercadoPago } from "@mercadopago/sdk-js";
+
+declare global {
+  interface Window {
+    MercadoPago: any;
+  }
+}
+
+await loadMercadoPago();
+const mp = new window.MercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
+
+const mountCardForm = async () => {
   const cardForm = mp.cardForm({
     amount: "100.5",
     iframe: true,
@@ -92,20 +103,21 @@ const loadCardForm = async (mp: any) => {
       onFetching: (resource: any) => {
         console.log("Fetching resource: ", resource);
 
-        // Animate progress bar
-        const progressBar = document.querySelector(".progress-bar");
-        if (!progressBar) throw new Error("Progress bar not found");
-        progressBar.removeAttribute("value");
+        // // Animate progress bar
+        // const progressBar = document.querySelector(".progress-bar");
+        // if (!progressBar) throw new Error("Progress bar not found");
+        // progressBar.removeAttribute("value");
 
-        return () => {
-          progressBar.setAttribute("value", "0");
-        };
+        // return () => {
+        //   progressBar.setAttribute("value", "0");
+        // };
       },
     },
   });
+  return cardForm;
 };
 
-const getDocumentTypes = async (mp: any) => {
+const getDocumentTypes = async () => {
   (async function getIdentificationTypes() {
     try {
       const identificationTypes = await mp.getIdentificationTypes();
@@ -145,4 +157,4 @@ const getDocumentTypes = async (mp: any) => {
   }
 };
 
-export { loadCardForm, getDocumentTypes };
+export { mountCardForm, getDocumentTypes };
