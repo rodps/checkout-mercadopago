@@ -2,6 +2,7 @@
 import FormPagamentoCartao from "@/components/FormPagamentoCartao.vue";
 import FormPagamentoPix from "./components/FormPagamentoPix.vue";
 import Pagamentos from "./components/Pagamentos.vue";
+import FormPagamentoBoleto from "./components/FormPagamentoBoleto.vue";
 
 declare global {
   interface Window {
@@ -12,7 +13,7 @@ declare global {
 
 <template>
   <Suspense>
-    <Pagamentos />
+    <FormPagamentoBoleto />
     <template #fallback> Carregando... </template>
   </Suspense>
 </template>
