@@ -6,6 +6,7 @@ import CreditCardIcon from "@/components/icons/CreditCardIcon.vue";
 import PixIcon from "@/components/icons/PixIcon.vue";
 import BoletoIcon from "@/components/icons/BoletoIcon.vue";
 import { ref } from "vue";
+import OptionFormaPagamento from "./components/OptionFormaPagamento.vue";
 
 const formaPagamento = ref<string>("cartao");
 </script>
@@ -22,36 +23,36 @@ const formaPagamento = ref<string>("cartao");
     </div>
     <p class="mb-3">Selecione a forma de pagamento:</p>
     <div class="grid grid-cols-3 gap-3 rounded mb-5">
-      <div
-        class="flex flex-col items-center border p-3 rounded cursor-pointer hover:border-blue-300 hover:shadow hover:bg-blue-100"
-        :class="{
-          'border-blue-300 shadow bg-blue-100': formaPagamento === 'cartao',
-        }"
-        @click="formaPagamento = 'cartao'"
+      <OptionFormaPagamento
+        :formaPagamento="formaPagamento"
+        :label="'Cartão de Credito'"
+        value="cartao"
+        @update:forma-pagamento="formaPagamento = $event"
       >
-        <CreditCardIcon class="w-10" />
-        <p>Cartão de crédito</p>
-      </div>
-      <div
-        class="flex flex-col items-center border p-3 rounded cursor-pointer hover:border-blue-300 hover:shadow hover:bg-blue-100"
-        :class="{
-          'border-blue-300 shadow bg-blue-100': formaPagamento === 'pix',
-        }"
-        @click="formaPagamento = 'pix'"
+        <template #icon>
+          <CreditCardIcon class="w-10" />
+        </template>
+      </OptionFormaPagamento>
+      <OptionFormaPagamento
+        :formaPagamento="formaPagamento"
+        label="Pix"
+        value="pix"
+        @update:forma-pagamento="formaPagamento = $event"
       >
-        <PixIcon class="w-10" />
-        <p>Pix</p>
-      </div>
-      <div
-        class="flex flex-col items-center border p-3 rounded cursor-pointer hover:border-blue-300 hover:shadow hover:bg-blue-100"
-        :class="{
-          'border-blue-300 shadow bg-blue-100': formaPagamento === 'boleto',
-        }"
-        @click="formaPagamento = 'boleto'"
+        <template #icon>
+          <PixIcon class="w-10" />
+        </template>
+      </OptionFormaPagamento>
+      <OptionFormaPagamento
+        :formaPagamento="formaPagamento"
+        label="Boleto"
+        value="boleto"
+        @update:forma-pagamento="formaPagamento = $event"
       >
-        <BoletoIcon class="w-10" />
-        <p>Boleto</p>
-      </div>
+        <template #icon>
+          <BoletoIcon class="w-10" />
+        </template>
+      </OptionFormaPagamento>
     </div>
     <Suspense v-if="formaPagamento === 'cartao'">
       <FormPagamentoCartao />
