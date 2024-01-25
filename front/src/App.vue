@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import FormPagamento from '@/components/FormPagamento.vue'
+import FormPagamentoCartao from "@/components/FormPagamentoCartao.vue";
+import FormPagamentoPix from "./components/FormPagamentoPix.vue";
+
+declare global {
+  interface Window {
+    MercadoPago: any;
+  }
+}
 </script>
 
 <template>
   <Suspense>
-    <FormPagamento />
+    <FormPagamentoPix />
     <template #fallback> Carregando... </template>
   </Suspense>
 </template>

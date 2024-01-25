@@ -1,17 +1,4 @@
-<script setup lang="ts">
-import { loadMercadoPago } from "@mercadopago/sdk-js";
-import { onMounted } from "vue";
-
-declare global {
-  interface Window {
-    MercadoPago: any;
-  }
-}
-
-await loadMercadoPago();
-const mp = new window.MercadoPago(import.meta.env.VITE_MERCADOPAGO_PUBLIC_KEY);
-
-onMounted(() => {
+const loadCardForm = async (mp: any) => {
   const cardForm = mp.cardForm({
     amount: "100.5",
     iframe: true,
@@ -116,46 +103,46 @@ onMounted(() => {
       },
     },
   });
-});
-</script>
+};
 
-<template>
-  <div class="page">
-    <h1>Pagamento</h1>
-    <form id="form-checkout">
-      <div id="form-checkout__cardNumber" class="container"></div>
-      <div id="form-checkout__expirationDate" class="container"></div>
-      <div id="form-checkout__securityCode" class="container"></div>
-      <input type="text" id="form-checkout__cardholderName" />
-      <select id="form-checkout__issuer"></select>
-      <select id="form-checkout__installments"></select>
-      <select id="form-checkout__identificationType"></select>
-      <input type="text" id="form-checkout__identificationNumber" />
-      <input type="email" id="form-checkout__cardholderEmail" />
+const getDocumentTypes = async (mp: any) => {
+  (async function getIdentificationTypes() {
+    try {
+      const identificationTypes = await mp.getIdentificationTypes();
+      const identificationTypeElement = document.getElementById(
+        "form-checkout__identificationType"
+      );
 
-      <button type="submit" id="form-checkout__submit">Pagar</button>
-      <progress value="0" class="progress-bar">Carregando...</progress>
-    </form>
-  </div>
-</template>
+      createSelectOptions(identificationTypeElement, identificationTypes);
+    } catch (e) {
+      return console.error("Error getting identificationTypes: ", e);
+    }
+  })();
 
-<style>
-#form-checkout {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  function createSelectOptions(
+    elem: any,
+    options: any,
+    labelsAndKeys = { label: "name", value: "id" }
+  ) {
+    const { label, value } = labelsAndKeys;
 
-.container {
-  height: 18px;
-  display: inline-block;
-  border: 1px solid rgb(118, 118, 118);
-  border-radius: 2px;
-  padding: 1px 2px;
-}
+    elem.options.length = 0;
 
-.page {
-  margin: 0 auto;
-  max-width: 600px;
-}
-</style>
+    const tempOptions = document.createDocumentFragment();
+
+    options.forEach((option: any) => {
+      const optValue = option[value];
+      const optLabel = option[label];
+
+      const opt = document.createElement("option");
+      opt.value = optValue;
+      opt.textContent = optLabel;
+
+      tempOptions.appendChild(opt);
+    });
+
+    elem.appendChild(tempOptions);
+  }
+};
+
+export { loadCardForm, getDocumentTypes };
