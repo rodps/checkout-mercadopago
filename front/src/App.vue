@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import FormPagamentoCartao from "@/components/FormPagamentoCartao.vue";
 import FormPagamentoPix from "./components/FormPagamentoPix.vue";
+import Pagamentos from "./components/Pagamentos.vue";
 
 declare global {
   interface Window {
@@ -11,7 +12,7 @@ declare global {
 
 <template>
   <Suspense>
-    <FormPagamentoPix />
+    <Pagamentos />
     <template #fallback> Carregando... </template>
   </Suspense>
 </template>

@@ -31,6 +31,13 @@ app.post('/process_payment', (req, res) => {
     .catch((error) => res.status(500).json(error))
 })
 
+app.get('/payments', (req, res) => {
+  const payment = new Payment(client)
+  payment.search()
+    .then((result) => res.json(result))
+    .catch((error) => res.status(500).json(error))
+})
+
 app.listen(3000, () => {
   console.log('Server listening on port 3000!')
 })
