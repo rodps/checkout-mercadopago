@@ -2,10 +2,24 @@
 import { onMounted, ref } from "vue";
 import { getDocumentTypes } from "@/lib/mercadopago";
 import Button from "./Button.vue";
+import { useProcessPayment } from "@/composables/useProcessPayment";
 
 const qrCodeBase64 = ref<string>("");
 const qrCode = ref<string>("");
 const ticketUrl = ref<string>("");
+const error = ref<string>("");
+
+const { processPayment, isLoading } = useProcessPayment({
+  onSuccess: (data) => {
+    qrCodeBase64.value =
+      data.point_of_interaction.transaction_data.qr_code_base64;
+    qrCode.value = data.point_of_interaction.transaction_data.qr_code;
+    ticketUrl.value = data.point_of_interaction.transaction_data.ticket_url;
+  },
+  onError: (err) => {
+    error.value = err;
+  },
+});
 
 onMounted(() => {
   getDocumentTypes();
@@ -15,13 +29,12 @@ const onSubmit = (ev: Event) => {
   ev.preventDefault();
   const formData = new FormData(ev.target as HTMLFormElement);
   const data = Object.fromEntries(formData.entries());
-  console.log("Submit");
-  const body = {
+  processPayment({
     description: data.description,
     transaction_amount: Number(data.transactionAmount),
     payment_method_id: "pix",
     payer: {
-      email: data.email,
+      email: import.meta.env.VITE_PAYER_EMAIL,
       first_name: data.payerFirstName,
       last_name: data.payerLastName,
       identification: {
@@ -29,22 +42,7 @@ const onSubmit = (ev: Event) => {
         number: data.identificationNumber,
       },
     },
-  };
-  fetch(`${import.meta.env.VITE_BACKEND_URL}/process_payment`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      console.log(res);
-      qrCodeBase64.value =
-        res.point_of_interaction.transaction_data.qr_code_base64;
-      qrCode.value = res.point_of_interaction.transaction_data.qr_code;
-      ticketUrl.value = res.point_of_interaction.transaction_data.ticket_url;
-    });
+  });
 };
 </script>
 
@@ -92,30 +90,24 @@ const onSubmit = (ev: Event) => {
       value="Nome do Produto"
     />
 
-    <Button label="Gerar QR Code" />
+    <Button label="Gerar QR Code" :loading="isLoading" />
   </form>
 
-  <div class="qrcode-container" v-if="qrCode">
+  <div
+    class="flex flex-col items-center justify-center gap-3 mt-5"
+    v-if="qrCode"
+  >
     <img
-      class="qrcode-img"
+      class="max-w-52"
       :src="`data:image/png;base64, ${qrCodeBase64}`"
       alt="QrCode"
     />
-    <input type="text" :value="qrCode" readonly />
-    <a :href="ticketUrl" target="_blank">Link externo</a>
+    <input type="text" :value="qrCode" readonly class="input" />
+    <a
+      :href="ticketUrl"
+      target="_blank"
+      class="text-blue-500 underline hover:text-blue-700"
+      >Link externo</a
+    >
   </div>
 </template>
-
-<style>
-.qrcode-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-}
-
-.qrcode-img {
-  max-width: 200px;
-}
-</style>
