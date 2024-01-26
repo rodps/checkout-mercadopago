@@ -1,6 +1,7 @@
 import { loadMercadoPago } from "@mercadopago/sdk-js";
 import axios from "axios";
 import { onMounted, onUnmounted, ref } from "vue";
+import { useProcessPayment } from "./useProcessPayment";
 
 declare global {
   interface Window {
@@ -18,7 +19,10 @@ export function useCardForm({
   onSuccess: (data: any) => void;
   onError: (error: string) => void;
 }) {
-  const isFetching = ref(false);
+  const { processPayment, isLoading } = useProcessPayment({
+    onSuccess,
+    onError,
+  })
 
   let cardForm: any;
 
@@ -77,7 +81,6 @@ export function useCardForm({
         },
         onSubmit: (event: any) => {
           event.preventDefault();
-          isFetching.value = true;
 
           const {
             paymentMethodId: payment_method_id,
@@ -89,48 +92,29 @@ export function useCardForm({
             identificationType,
           } = cardForm.getCardFormData();
 
-          axios
-            .post(`${import.meta.env.VITE_BACKEND_URL}/process_payment`, {
-              token,
-              issuer_id,
-              payment_method_id,
-              transaction_amount: Number(amount),
-              installments: Number(installments),
-              description: "Descrição do produto",
-              payer: {
-                email: import.meta.env.VITE_PAYER_EMAIL,
-                identification: {
-                  type: identificationType,
-                  number: identificationNumber,
-                },
+          processPayment({
+            token,
+            issuer_id,
+            payment_method_id,
+            transaction_amount: Number(amount),
+            installments: Number(installments),
+            description: "Descrição do produto",
+            payer: {
+              email: import.meta.env.VITE_PAYER_EMAIL,
+              identification: {
+                type: identificationType,
+                number: identificationNumber,
               },
-            })
-            .then((data) => {
-              onSuccess(data);
-              isFetching.value = false;
-            })
-            .catch((error) => {
-              if (error.response) {
-                onError(error.response.data.message);
-              } else if (error.request) {
-                onError(
-                  "Sem resposta do servidor. Por favor, tente novamente mais tarde."
-                );
-              } else {
-                onError(
-                  "Erro interno do servidor. Por favor, entre em contato com o suporte"
-                );
-              }
-              isFetching.value = false;
-            });
+            },
+          });
         },
-        onFetching: (resource: any) => {
-          console.log("Fetching resource: ", resource);
-        },
+        onError: (error: any) => {
+          onError(error);
+        }
       },
     });
     return cardForm;
   };
 
-  return { isFetching };
+  return { isLoading };
 }

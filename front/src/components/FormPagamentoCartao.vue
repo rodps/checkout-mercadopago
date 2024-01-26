@@ -10,7 +10,7 @@ const emit = defineEmits<{
 
 const error = ref<string>("");
 
-const { isFetching } = useCardForm({
+const { isLoading } = useCardForm({
   onSuccess: () => {
     emit("success");
   },
@@ -33,6 +33,6 @@ const { isFetching } = useCardForm({
 
     <ErrorMessage :error="error" />
 
-    <Button label="Pagar" :loading="isFetching" />
+    <Button label="Pagar" :loading="isLoading" />
   </form>
 </template>
