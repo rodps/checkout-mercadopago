@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { getDocumentTypes } from "@/lib/mercadopago";
+import Button from "./Button.vue";
 
 const boleto = ref<string>("");
 
@@ -86,7 +87,7 @@ const onSubmit = (ev: Event) => {
       value="Nome do Produto"
     />
 
-    <button type="submit" class="btn-primary">Pagar</button>
+    <Button label="Gerar boleto" />
   </form>
 
   <a :href="boleto" target="_blank" v-if="boleto">Imprimir boleto</a>

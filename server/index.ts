@@ -28,7 +28,9 @@ app.post('/process_payment', (req, res) => {
       body: req.body
     })
     .then((result) => res.json(result))
-    .catch((error) => res.status(500).json(error))
+    .catch((error) => {
+      res.status(500).json(error)
+    })
 })
 
 app.get('/payments', (req, res) => {

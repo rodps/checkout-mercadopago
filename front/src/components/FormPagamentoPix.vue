@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { getDocumentTypes } from "@/lib/mercadopago";
+import Button from "./Button.vue";
 
 const qrCodeBase64 = ref<string>("");
 const qrCode = ref<string>("");
@@ -91,7 +92,7 @@ const onSubmit = (ev: Event) => {
       value="Nome do Produto"
     />
 
-    <button type="submit" class="btn-primary">Pagar</button>
+    <Button label="Gerar QR Code" />
   </form>
 
   <div class="qrcode-container" v-if="qrCode">

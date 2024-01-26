@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
-import { mountCardForm } from "@/lib/mercadopago";
+import { ref } from "vue";
+import Button from "./Button.vue";
+import { useCardForm } from "@/composables/useCardForm";
 
-let cardform: any = null;
+const emit = defineEmits<{
+  (e: "success"): void;
+}>();
 
-onMounted(async () => {
-  cardform = await mountCardForm();
-});
+const error = ref<string>("");
 
-onUnmounted(() => {
-  cardform.unmount();
+const { isFetching } = useCardForm({
+  onSuccess: () => {
+    emit("success");
+  },
+  onError: (err) => {
+    error.value = err;
+  },
 });
 </script>
 
@@ -23,11 +29,17 @@ onUnmounted(() => {
     <select id="form-checkout__installments" class="input"></select>
     <select id="form-checkout__identificationType" class="input"></select>
     <input type="text" id="form-checkout__identificationNumber" class="input" />
-    <input type="email" id="form-checkout__cardholderEmail" class="input" />
 
-    <button type="submit" id="form-checkout__submit" class="btn-primary">
-      Pagar
-    </button>
-    <!-- <progress value="0" class="w-full">Carregando...</progress> -->
+    <div
+      class="text-red-500 my-3 bg-red-100 p-3 rounded text-center"
+      v-if="error"
+    >
+      <p class="mb-3">
+        Houve um erro ao processar o pagamento. Tente novamente mais tarde ou
+        entre em contato com o suporte.
+      </p>
+      <p>Detalhes: {{ error }}</p>
+    </div>
+    <Button label="Pagar" :loading="isFetching" />
   </form>
 </template>
