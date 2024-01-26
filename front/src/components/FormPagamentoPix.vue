@@ -3,6 +3,7 @@ import { onMounted, ref } from "vue";
 import { getDocumentTypes } from "@/lib/mercadopago";
 import Button from "./Button.vue";
 import { useProcessPayment } from "@/composables/useProcessPayment";
+import ErrorMessage from "./ErrorMessage.vue";
 
 const qrCodeBase64 = ref<string>("");
 const qrCode = ref<string>("");
@@ -89,6 +90,8 @@ const onSubmit = (ev: Event) => {
       id="description"
       value="Nome do Produto"
     />
+
+    <ErrorMessage :error="error" />
 
     <Button label="Gerar QR Code" :loading="isLoading" />
   </form>

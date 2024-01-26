@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import Button from "./Button.vue";
 import { useCardForm } from "@/composables/useCardForm";
+import ErrorMessage from "./ErrorMessage.vue";
 
 const emit = defineEmits<{
   (e: "success"): void;
@@ -30,16 +31,8 @@ const { isFetching } = useCardForm({
     <select id="form-checkout__identificationType" class="input"></select>
     <input type="text" id="form-checkout__identificationNumber" class="input" />
 
-    <div
-      class="text-red-500 my-3 bg-red-100 p-3 rounded text-center"
-      v-if="error"
-    >
-      <p class="mb-3">
-        Houve um erro ao processar o pagamento. Tente novamente mais tarde ou
-        entre em contato com o suporte.
-      </p>
-      <p>Detalhes: {{ error }}</p>
-    </div>
+    <ErrorMessage :error="error" />
+
     <Button label="Pagar" :loading="isFetching" />
   </form>
 </template>
