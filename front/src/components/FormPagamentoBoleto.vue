@@ -2,8 +2,20 @@
 import { onMounted, ref } from "vue";
 import { getDocumentTypes } from "@/lib/mercadopago";
 import Button from "./Button.vue";
+import { useProcessPayment } from "@/composables/useProcessPayment";
+import ErrorMessage from "./ErrorMessage.vue";
 
 const boleto = ref<string>("");
+const error = ref<string>("");
+
+const { processPayment, isLoading } = useProcessPayment({
+  onSuccess: (data) => {
+    boleto.value = data.transaction_details.external_resource_url;
+  },
+  onError: (err) => {
+    error.value = err;
+  },
+});
 
 onMounted(() => {
   getDocumentTypes();
@@ -13,8 +25,7 @@ const onSubmit = (ev: Event) => {
   ev.preventDefault();
   const formData = new FormData(ev.target as HTMLFormElement);
   const data = Object.fromEntries(formData.entries());
-  console.log("Submit");
-  const body = {
+  processPayment({
     description: data.description,
     transaction_amount: Number(data.transactionAmount),
     payment_method_id: "bolbradesco",
@@ -27,19 +38,7 @@ const onSubmit = (ev: Event) => {
         number: data.identificationNumber,
       },
     },
-  };
-  fetch(`${import.meta.env.VITE_BACKEND_URL}/process_payment`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      console.log(res);
-      boleto.value = res.transaction_details.external_resource_url;
-    });
+  });
 };
 </script>
 
@@ -87,7 +86,9 @@ const onSubmit = (ev: Event) => {
       value="Nome do Produto"
     />
 
-    <Button label="Gerar boleto" />
+    <ErrorMessage :error="error" />
+
+    <Button label="Gerar boleto" :loading="isLoading" />
   </form>
 
   <a :href="boleto" target="_blank" v-if="boleto">Imprimir boleto</a>
